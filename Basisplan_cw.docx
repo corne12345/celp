@@ -1,0 +1,37 @@
+Opties soort aanbeveling
+Ten eerste is het handig om te kiezen wat voor soort aanbeveling we willen doen.
+
+De insteek is hier een content-based systeem aangezien de dichtheid van de user rating data te dun lijkt voor een acceptabele collaborative filtering aanpak.
+
+Ik zie 2 basismogelijkheden:
+
+1. 
+We maken een similarity analyse van bedrijven gebaseerd op een bedrijf dat geselecteerd is door de gebruiker. (dus een “meer items zoals de gene waar je naar kijkt” zoals B.V. Amazon.)
+
+Dan maken we dus een lijst van bedrijven die tenminste een door ons gekozen mate van gelijkheid hebben met het geselecteerde bedrijf op basis van de kolommen 'attributes' en 'categories' van business.json. Dit kan ingewikkeld worden aangezien 'attributes' en 'categories' geen numerieke waardes zijn waar je een (adjusted) cosine similarity berekening op kan loslaten. Hier zou dus een gelijkheidsanalyse d.m.v. SpaCy plaats moeten vinden met een decision tree. TF-IDF lijk mij hier niet van toepassing aangezien elke categorisatie maar 1x voorkomt per bedrijf. 
+
+ Daar nemen we dan de hoogst scorende van gebaseerd op de 'stars' kolom in de zelfde business.json. Ik neem aan dat dit een naar tevredenheid functionerende rating is op basis van de user reviews. Het is wellicht mogelijk om de data van business.json van te voren op te schonen door bedrijven met een te bepalen lage rating (2 sterren of lager?) en/of een te bepalen schaarste aan ratings (minder dan 5 reviews?) uit de werkdatabase te halen om berekeningen sneller te laten verlopen.
+
+De uiteindelijke aanradingen zijn dan de 10 hoogst scorende bedrijven uit de lijst van acceptabel gelijke bedrijven vergeleken met het geselecteerde bedrijf.
+
+Optioneel: Een vermenigvuldigingsfactor voor de top 10 selectie op basis van hoe dicht de kandidaat-bedrijven zijn bij de locatie van de gebruiker (op basis van lat-lon en de locatie van de smartphone van de gebruiker). Alternatief is de top 10 vastgelegd en worden deze gepresenteerd op volgorde van nabijheid. (dus “10 besten” niet 1e plaats, 2e plaats etc. voor de kwaliteit van de bedrijven)
+
+2. 
+De gebruiker selecteert uit een lijst van categorieën labels waar het bedrijf aan moet voldoen. Bijvoorbeeld “restaurant” met eventueel “restaurant – Thais” als dat praktisch lijkt. Dit wellicht via menus en submenus (start ? restaurant ? Thais)
+
+Hier is de selectie van  kandidaat-bedrijven simpeler, alleen de bedrijven met de gewenste labels gaan in de selectielijst om vervolgens zoals in de voorafgaande suggestie op volgorde van rating gepresenteerd te worden aan de gebruiker.
+
+Ook hier is er de mogelijkheid om de top 10 te laten beïnvloeden door nabijheid zoals hierboven.
+
+
+
+Data opschonen
+De database waar we de zoekcriteria op loslaten is in principe erg groot. Daarom zou het voor de respons-tijd van het website goed zijn als we de database eerst verkleinen voordat we er berekeningen op loslaten. Het verwijderen van slecht gerate bedrijven en bedrijven met weinig tot geen ratings ligt voor de hand. 
+
+Het is ook mogelijk om alle kolommen die we toch niet gebruiken te verwijderen. Dit is natuurlijk afhankelijk van welke onderdelen we besluiten te gebruiken. Ik weet echter niet of het verwijderen van kolommen waar je toch niet over itereert veel efficiëntie winst oplevert.
+
+
+Opties
+We werken in het bovenstaande voorstellen uitsluitend met business.json. We zouden de rating voor elk bedrijf zelf nog eens kunnen berekenen op basis van mean-centered ratings van de gebruikers. Ik denk echter niet dat hier wat significant anders zou uitkomen dan de meegeleverde stars score. 
+
+Bepaling van zoektermen zou kunnen plaatsvinden met door de gebruiker vrij in te voeren zoektermen die dan via een SpaCy methode losgelaten worden op 'attributes' en 'categories' en wellicht op review.json 'text' voor commentaar als “best Thai food ever” etc. Dit kan echter snel ingewikkeld worden, maar zou wel een interessante verfijning van de selectie kunnen betekenen.
